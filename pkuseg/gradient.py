@@ -30,9 +30,10 @@ def get_grad_CRF(
     bel = _inf.belief(len(x), n_tag)
     belMasked = _inf.belief(len(x), n_tag)
 
-    YYlist, Ylist, maskYYlist, maskYlist = _inf.getYYandY(model, x)
-    _inf.getBeliefs(bel, model, x, YYlist, Ylist)
-    _inf.getBeliefs(belMasked, model, x, maskYYlist, maskYlist)
+    Ylist, YYlist, maskYlist, maskYYlist = _inf.getYYandY(model, x)
+    # print(YYlist.shape, Ylist.shape, maskYYlist.shape, maskYlist.shape)
+    _inf.get_beliefs(bel, model, x, Ylist, YYlist)
+    _inf.get_beliefs(belMasked, model, x, maskYlist, maskYYlist)
 
     ZGold = belMasked.Z
     Z = bel.Z

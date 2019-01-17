@@ -172,7 +172,7 @@ def decodeViterbi_fast(feature_temp, model):
 
 def getYYandY(model, example):
     Y, YY = getLogYY(example.features, model.n_tag, model.n_feature*model.n_tag, model.w, 1.0)
-    mask_Y = maskY(example.tags, len(example), model.n_feature, Y)
-    mask_YY = mask_Y.copy()
-    return YY, Y, mask_YY, mask_Y
+    mask_Y = maskY(example.tags, len(example), model.n_tag, Y)
+    mask_YY = YY.copy()
+    return Y, YY, mask_Y, mask_YY
 

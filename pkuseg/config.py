@@ -23,7 +23,7 @@ class Config:
         self.trainFile = os.path.join("data", "small_training.utf8")
         self.testFile = os.path.join("data", "small_test.utf8")
         self._tmp_dir = tempfile.TemporaryDirectory()
-        self.homepath = self._tmp_dir.name
+        self.homepath = "tmp"  # self._tmp_dir.name
         self.tempFile = os.path.join(self.homepath, ".pkuseg", "temp")
         self.readFile = os.path.join("data", "small_test.utf8")
         self.outputFile = os.path.join("data", "small_test_output.utf8")

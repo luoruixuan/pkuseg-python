@@ -35,7 +35,7 @@ class ADF(Optimizer):
 
         self._model = model
         self._X = dataset
-        self.decayList = np.ones_like(self._model.W) * config.rate0
+        self.decayList = np.ones_like(self._model.w) * config.rate0
 
     def optimize(self):
         config = self.config
@@ -96,7 +96,7 @@ class ADF(Optimizer):
                     * feature_count_list
                     / n_sample
                 )
-                feature_count_list = 0
+                feature_count_list.fill(0)
 
                 # for i in range(fsize):
                 #     v = feature_count_list[i]

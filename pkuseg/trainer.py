@@ -34,6 +34,8 @@ def train(config=None):
     if config is None:
         config = Config()
 
+    feature_extractor = FeatureExtractor.load()
+
     feature_extractor = FeatureExtractor()
     feature_extractor.build(config.trainFile)
     feature_extractor.save()
@@ -83,7 +85,7 @@ def train(config=None):
     if config.rawResWrite:
         config.swResRaw.write("\n%r: {}\n".format(config.reg))
 
-    trainer = Trainer(config, trainset)
+    trainer = Trainer(config, trainset, feature_extractor)
 
     time_list = []
     err_list = []
@@ -128,15 +130,15 @@ class Trainer:
     def __init__(self, config, dataset, feature_extractor):
         self.config = config
         self.X = dataset
-        self.n_feature = dataset.nFeature
-        self.n_tag = dataset.nTag
+        self.n_feature = dataset.n_feature
+        self.n_tag = dataset.n_tag
 
         self.model = Model(self.n_feature, self.n_tag)
         self.optim = self._get_optimizer(dataset, self.model)
 
         self.feature_extractor = feature_extractor
         self.idx_to_chunk_tag = {}
-        for idx, tag in feature_extractor.tag_to_idx:
+        for tag, idx in feature_extractor.tag_to_idx.items():
             if tag.startswith("I"):
                 tag = "I"
             if tag.startswith("O"):
@@ -353,7 +355,7 @@ class Trainer:
             gold_tags.append(",".join(map(str, gold)))
 
         scoreList, infoList = getFscore(
-            gold_tags, pred_tags, infoList, self.idx_to_chunk_tag
+            gold_tags, pred_tags, self.idx_to_chunk_tag
         )
         config.swLog.write(
             "#gold-chunk={}  #output-chunk={}  #correct-output-chunk={}  precision={:.2f}  recall={:.2f}  f-score={:.2f}\n".format(

@@ -44,7 +44,7 @@ def getFscore(goldTagList, resTagList, idx_to_chunk_tag):
     infoList.append(gold_chunk)
     infoList.append(res_chunk)
     infoList.append(correct_chunk)
-    return scoreList
+    return scoreList, infoList
 
 
 def getNewTagList(tagMap, tagList):

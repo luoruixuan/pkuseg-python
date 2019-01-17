@@ -61,18 +61,20 @@ class FeatureExtractor:
 
         # first pass to collect unigram and bigram and tag info
         word_length_info = Counter()
+        specials = set()
         for line in lines:
             line = line.strip("\n\r")  # .replace("\t", " ")
             if not line:
                 continue
 
-            line = self.keywords_translate_table(line)
+            line = self.keyword_rename(line)
 
             # str.split() without sep sees consecutive whiltespaces as one separator
             # e.g., '\ra \t　b \r\n'.split() = ['a', 'b']
             words = [word for word in line.split()]
 
             word_length_info.update(map(len, words))
+            specials.update(word for word in words if len(word)>=10)
             self.unigram.update(words)
 
             for pre, suf in zip(words[:-1], words[1:]):
@@ -86,9 +88,9 @@ class FeatureExtractor:
             examples.append(example)
 
         max_word_length = max(word_length_info.keys())
-        for length in range(max_word_length):
-            print("length = {} : {}".format(length, max_word_length[length]))
-
+        for length in range(1, max_word_length + 1):
+            print("length = {} : {}".format(length, word_length_info[length]))
+        print('special words: {}'.format(', '.join(specials)))
         # second pass to get features
 
         feature_freq = Counter()
@@ -270,7 +272,7 @@ class FeatureExtractor:
         with open(feature_file, "r", encoding="utf8") as reader:
             lines = reader.readlines()
 
-        with open(feature_idx_file, "w", encoding="uf8") as f_writer, open(
+        with open(feature_idx_file, "w", encoding="utf8") as f_writer, open(
             tag_idx_file, "w", encoding="utf8"
         ) as t_writer:
 
@@ -287,11 +289,11 @@ class FeatureExtractor:
                         if not features_idx:
                             f_writer.write("0\n")
                         else:
-                            f_writer.write(",".join(feautre_idx))
+                            f_writer.write(",".join(map(str, feautre_idx)))
                             f_writer.write("\n")
                     f_writer.write("\n")
 
-                    t_writer.write(",".join(tags_idx))
+                    t_writer.write(",".join(map(str, tags_idx)))
                     t_writer.write("\n\n")
 
                     tags_idx = []
@@ -300,12 +302,12 @@ class FeatureExtractor:
 
                 splits = line.split(" ")
                 feature_idx = [
-                    str(self.feature_to_idx[feat])
+                    self.feature_to_idx[feat]
                     for feat in splits[1:-1]
                     if feat in self.feature_to_idx
                 ]
                 features_idx.append(feature_idx)
-                tags_idx.append(str(splits[-1]))
+                tags_idx.append(self.tag_to_idx[splits[-1]])
 
     def convert_text_file_to_feature_file(
         self, text_file, conll_file=None, feature_file=None
@@ -338,7 +340,7 @@ class FeatureExtractor:
         conll_line_format = "{} {}\n"
 
         with open(text_file, "r", encoding="utf8") as reader, open(
-            conll_file, "w", encoding="uf8"
+            conll_file, "w", encoding="utf8"
         ) as c_writer, open(feature_file, "w", encoding="utf8") as f_writer:
             for line in reader:
                 line = line.strip()
@@ -368,6 +370,7 @@ class FeatureExtractor:
                             )
                         else:
                             example.append(char)
+                        tags.append(tag)
                 c_writer.write("\n")
 
                 for idx, tag in enumerate(tags):
@@ -391,7 +394,7 @@ class FeatureExtractor:
         with open(
             os.path.join(config.modelDir, "features.json"), "w", encoding="utf8"
         ) as writer:
-            json.dump(data, writer, ensure_ascii=True)
+            json.dump(data, writer, ensure_ascii=False)
 
     @classmethod
     def load(cls):

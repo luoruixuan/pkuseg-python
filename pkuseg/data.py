@@ -268,10 +268,12 @@ class DataSet:
             tag_idx_file, encoding="utf-8"
         ) as t_reader:
 
-            example_strs = f_reader.read().split("\n\n")
-            tags_strs = t_reader.read().split("\n\n")
+            example_strs = f_reader.read().split("\n\n")[:-1]
+            tags_strs = t_reader.read().split("\n\n")[:-1]
 
-        assert len(example_strs) == len(tags_strs)
+        assert len(example_strs) == len(
+            tags_strs
+        ), "lengths do not match:\t{}\n{}\n".format(example_strs, tags_strs)
 
         n_feature = int(example_strs[0])
         n_tag = int(tags_strs[0])
@@ -282,7 +284,7 @@ class DataSet:
 
         for example_str, tags_str in zip(example_strs[1:], tags_strs[1:]):
             features = [
-                list(map(int, feature_line.split(" ")))
+                list(map(int, feature_line.split(",")))
                 for feature_line in example_str.split("\n")
             ]
             tags = tags_str.split(",")

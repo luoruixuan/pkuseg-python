@@ -7,7 +7,7 @@ class Model:
     def __init__(self, n_feature, n_tag):
 
         self.n_tag = n_tag
-        self.n_feature = self.n_feature
+        self.n_feature = n_feature
         self.n_transition_feature = n_tag * (n_feature + n_tag)
         if config.random:
             self.w = np.random.random(size=(self.n_transition_feature,)) * 2 - 1
@@ -33,6 +33,7 @@ class Model:
             w[i - 2] = float(ary[i].strip())
         model.w = w
         model.n_feature = wsize // model.n_tag - model.n_tag
+        model.n_transition_feature = wsize
         return model
 
     @classmethod
@@ -47,9 +48,11 @@ class Model:
         new_model.n_feature = (
             new_model.w.shape[0] // new_model.n_tag - new_model.n_tag
         )
+        new_model.n_transition_feature = new_model.w.shape[0]
         return new_model
 
     def save(self, file):
+        np.save
         with open(file, "w", encoding="utf-8") as f:
             f.write("{}\n{}\n".format(self.n_tag, self.w.shape[0]))
             for value in self.w:

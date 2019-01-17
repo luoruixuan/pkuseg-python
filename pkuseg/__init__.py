@@ -247,6 +247,9 @@ def train(trainFile, testFile, savedir, nthread=10):
     config.modelDir = savedir
     config.fModel = os.path.join(config.modelDir, "model.txt")
     config.nThread = nthread
+
+    os.makedirs(config.modelDir, exist_ok=True)
+
     pkuseg.trainer.train(config)
 
     # pkuseg.main.run(config)
