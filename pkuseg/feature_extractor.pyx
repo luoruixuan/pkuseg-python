@@ -38,7 +38,8 @@ class FeatureExtractor:
         for character in text:
             if config.numLetterNorm:
                 yield cls._num_letter_normalize_char(character)
-            yield character
+            else:
+                yield character
 
     @staticmethod
     def get_slice_str(iterable, start, length):
@@ -413,8 +414,8 @@ class FeatureExtractor:
 
             return extractor
         print(
-            "WARNING: features.json does not exist, try load using old format",
-            #file=sys.stderr,
+            "WARNING: features.json does not exist, try loading using old format",
+            file=sys.stderr,
         )
 
         with open(
@@ -449,5 +450,11 @@ class FeatureExtractor:
             for line in reader:
                 tag, index = line.split(" ")
                 extractor.tag_to_idx[tag] = int(index)
+
+        print(
+            "INFO: features.json is saved",
+            file=sys.stderr,
+        )
+        extractor.save()
 
         return extractor

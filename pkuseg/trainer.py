@@ -22,7 +22,8 @@ import pkuseg.inference as _inf
 # from .gradient import *
 from pkuseg.optimizer import ADF
 from pkuseg.scorer import getFscore
-from typing import TextIO
+
+# from typing import TextIO
 
 # from .res_summarize import summarize
 # from .res_summarize import write as reswrite
@@ -115,7 +116,7 @@ def train(config=None):
 
     res_summarize.write(config, time_list, err_list, diff_list, score_list_list)
     if config.save == 1:
-        trainer.model.save(config.fModel)
+        trainer.model.save()
 
     config.swLog.close()
     config.swResRaw.close()

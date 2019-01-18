@@ -106,7 +106,7 @@ class PKUSeg:
             )
         else:
             config.modelDir = model_name
-        config.fModel = os.path.join(config.modelDir, "model.txt")
+        # config.fModel = os.path.join(config.modelDir, "model.txt")
         if user_dict == "safe_lexicon":
             file_name = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
@@ -118,7 +118,7 @@ class PKUSeg:
         self.preprocesser = Preprocesser(file_name)
 
         self.feature_extractor = FeatureExtractor.load()
-        self.model = Model.load(config.fModel)
+        self.model = Model.load()
 
         self.idx_to_tag = {
             idx: tag for tag, idx in self.feature_extractor.tag_to_idx.items()
@@ -171,7 +171,7 @@ class PKUSeg:
             )
 
             node_feature_idx = []
-            for feature in enumerate(node_feature):
+            for feature in node_feature:
                 feature_idx = self.feature_extractor.feature_to_idx.get(feature)
                 if feature_idx is not None:
                     node_feature_idx.append(feature_idx)
@@ -245,7 +245,7 @@ def train(trainFile, testFile, savedir, nthread=10):
     config.trainFile = trainFile
     config.testFile = testFile
     config.modelDir = savedir
-    config.fModel = os.path.join(config.modelDir, "model.txt")
+    # config.fModel = os.path.join(config.modelDir, "model.txt")
     config.nThread = nthread
 
     os.makedirs(config.modelDir, exist_ok=True)

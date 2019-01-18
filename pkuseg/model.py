@@ -1,3 +1,5 @@
+import os
+import sys
 import numpy as np
 
 from .config import config
@@ -21,7 +23,28 @@ class Model:
         return self.n_feature * self.n_tag + tag_id * self.n_tag + pre_tag_id
 
     @classmethod
-    def load(cls, model_path):
+    def load(cls):
+        model_path = os.path.join(config.modelDir, "weights.npz")
+        if os.path.exists(model_path):
+            npz = np.load(model_path)
+            sizes = npz["sizes"]
+            w = npz["w"]
+            model = cls.__new__(cls)
+            model.n_tag = int(sizes[0])
+            model.n_feature = int(sizes[1])
+            model.n_transition_feature = model.n_tag * (
+                model.n_feature + model.n_tag
+            )
+            model.w = w
+            assert model.w.shape[0] == model.n_transition_feature
+            return model
+
+        print(
+            "WARNING: weights.npz does not exist, try loading using old format",
+            file=sys.stderr,
+        )
+
+        model_path = os.path.join(config.modelDir, "model.txt")
         with open(model_path, encoding="utf-8") as f:
             ary = f.readlines()
 
@@ -34,6 +57,8 @@ class Model:
         model.w = w
         model.n_feature = wsize // model.n_tag - model.n_tag
         model.n_transition_feature = wsize
+
+        model.save()
         return model
 
     @classmethod
@@ -51,9 +76,13 @@ class Model:
         new_model.n_transition_feature = new_model.w.shape[0]
         return new_model
 
-    def save(self, file):
-        np.save
-        with open(file, "w", encoding="utf-8") as f:
-            f.write("{}\n{}\n".format(self.n_tag, self.w.shape[0]))
-            for value in self.w:
-                f.write("{:.4f}\n".format(value))
+    def save(self):
+        sizes = np.array([self.n_tag, self.n_feature])
+        np.savez(
+            os.path.join(config.modelDir, "weights.npz"), sizes=sizes, w=self.w
+        )
+        # np.save
+        # with open(file, "w", encoding="utf-8") as f:
+        #     f.write("{}\n{}\n".format(self.n_tag, self.w.shape[0]))
+        #     for value in self.w:
+        #         f.write("{:.4f}\n".format(value))

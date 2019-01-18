@@ -117,7 +117,7 @@ class ADF(Optimizer):
             if check or end:
                 if config.reg != 0:
                     w -= self.decayList * (
-                        w / config.reg * config.reg * n_sample / xsize
+                        w / (config.reg * config.reg) * n_sample / xsize
                     )
 
                     # for i in range(fsize):
