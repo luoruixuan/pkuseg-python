@@ -1,3 +1,6 @@
+# distutils: language = c++
+# cython: infer_types=True
+# cython: language_level=3
 import json
 import os
 import sys
@@ -22,20 +25,20 @@ class FeatureExtractor:
         return text.translate(cls.keywords_translate_table)
 
     @classmethod
-    def _num_letter_normalize_char(cls, char):
-        if char in cls.num:
+    def _num_letter_normalize_char(cls, character):
+        if character in cls.num:
             return "**Num"
-        if char in cls.letter:
+        if character in cls.letter:
             return "**Letter"
-        return char
+        return character
 
     @classmethod
     def normalize_text(cls, text):
         text = cls.keyword_rename(text)
-        for char in text:
+        for character in text:
             if config.numLetterNorm:
-                yield cls._num_letter_normalize_char(char)
-            yield char
+                yield cls._num_letter_normalize_char(character)
+            yield character
 
     @staticmethod
     def get_slice_str(iterable, start, length):
@@ -81,9 +84,9 @@ class FeatureExtractor:
                 self.bigram.add("{}*{}".format(pre, suf))
 
             example = [
-                self._num_letter_normalize_char(char)
+                self._num_letter_normalize_char(character)
                 for word in words
-                for char in word
+                for character in word
             ]
             examples.append(example)
 
@@ -244,7 +247,7 @@ class FeatureExtractor:
                 tmplst.append("**noWord")
         postlst_ex = tmplst
 
-        # this char is in the middle of a word
+        # this character is in the middle of a word
         # 2*(wordMax-wordMin+1)^2 (default: 2*(6-2+1)^2=50)
 
         for pre in prelst_ex:
@@ -351,7 +354,7 @@ class FeatureExtractor:
                 tags = []
                 for word in words:
                     word_length = len(word)
-                    for idx, char in enumerate(word):
+                    for idx, character in enumerate(word):
                         if word_length == 1:
                             tag = B_single
                         elif idx == 0:
@@ -362,14 +365,14 @@ class FeatureExtractor:
                             tag = I_first
                         else:
                             tag = I
-                        c_writer.write(conll_line_format.format(char, tag))
+                        c_writer.write(conll_line_format.format(character, tag))
 
                         if config.numLetterNorm:
                             example.append(
-                                self._num_letter_normalize_char(char)
+                                self._num_letter_normalize_char(character)
                             )
                         else:
-                            example.append(char)
+                            example.append(character)
                         tags.append(tag)
                 c_writer.write("\n")
 
@@ -411,7 +414,7 @@ class FeatureExtractor:
             return extractor
         print(
             "WARNING: features.json does not exist, try load using old format",
-            file=sys.stderr,
+            #file=sys.stderr,
         )
 
         with open(

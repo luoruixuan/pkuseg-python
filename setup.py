@@ -14,7 +14,12 @@ def setup_package():
             "pkuseg.inference",
             ["pkuseg/inference.pyx"],
             include_dirs=[np.get_include()],
-        )
+        ),
+        Extension(
+            "pkuseg.feature_extractor",
+            ["pkuseg/feature_extractor.pyx"],
+            include_dirs=[np.get_include()],
+        ),
     ]
 
     setuptools.setup(
