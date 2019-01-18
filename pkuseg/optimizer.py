@@ -77,7 +77,7 @@ class ADF(Optimizer):
 
             feature_set = list(feature_set)
 
-            feature_count_list[list(feature_set)] += 1
+            feature_count_list[feature_set] += 1
 
             # for i in feature_set:
             #     feature_count_list[i] += 1

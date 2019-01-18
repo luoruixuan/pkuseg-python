@@ -327,7 +327,7 @@ class DataSet:
 class Example:
     def __init__(self, features, tags):
         self.features = features  # type: List[List[int]]
-        self.tags = tags  # type: List[int]
+        self.tags = list(map(int, tags))  # type: List[int]
         self.predicted_tags = None
 
     def __len__(self):

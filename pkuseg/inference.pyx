@@ -1,5 +1,6 @@
 # distutils: language = c++
 # cython: infer_types=True
+# cython: language_level=3
 cimport cython
 import numpy as np
 cimport numpy as np
@@ -15,7 +16,7 @@ np.import_array()
 class belief:
     def __init__(self, nNodes, nStates):
         self.belState = np.zeros((nNodes, nStates))
-        self.belEdge = np.zeros((nNodes, nStates, nStates))
+        self.belEdge = np.zeros((nNodes, nStates * nStates))
         self.Z = 0
 
 
@@ -24,13 +25,16 @@ class belief:
 cpdef get_beliefs(object bel, object m, object x, np.ndarray[double, ndim=2] Y, np.ndarray[double, ndim=2] YY):
     cdef:
         np.ndarray[double, ndim=2] belState = bel.belState
-        np.ndarray[double, ndim=3] belEdge = bel.belEdge
+        np.ndarray[double, ndim=2] belEdge = bel.belEdge
         int nNodes = len(x)
         int nTag = m.n_tag
         double Z = 0
         np.ndarray[double, ndim=1] alpha_Y = np.zeros(nTag)
         np.ndarray[double, ndim=1] newAlpha_Y = np.zeros(nTag)
         np.ndarray[double, ndim=1] tmp_Y = np.zeros(nTag)
+        np.ndarray[double, ndim=2] YY_trans = YY.transpose()
+        np.ndarray[double, ndim=1] YY_t_r = YY_trans.reshape(-1)
+        np.ndarray[double, ndim=1] sum_edge = np.zeros(nTag * nTag)
 
     for i in range(nNodes - 1, 0, -1):
         tmp_Y = belState[i] + Y[i]
@@ -39,24 +43,24 @@ cpdef get_beliefs(object bel, object m, object x, np.ndarray[double, ndim=2] Y, 
     for i in range(nNodes):
         if i > 0:
             tmp_Y = alpha_Y.copy()
-            newAlpha_Y = logMultiply(YY.transpose(), tmp_Y) + Y[i]
+            newAlpha_Y = logMultiply(YY_trans, tmp_Y) + Y[i]
         else:
             newAlpha_Y = Y[i].copy()
         if i > 0:
             tmp_Y = Y[i] + belState[i]
-            belEdge[i] = YY
+            belEdge[i] = YY_t_r
             for yPre in range(nTag):
                 for y in range(nTag):
-                    belEdge[i][yPre, y] += tmp_Y[y] + alpha_Y[yPre]
+                    #belEdge[i][yPre, y] += tmp_Y[y] + alpha_Y[yPre]
+                    belEdge[i, y * nTag + yPre] += tmp_Y[y] + alpha_Y[yPre]
         belState[i] = belState[i] + newAlpha_Y
         alpha_Y = newAlpha_Y
     Z = logSum(alpha_Y)
     for i in range(nNodes):
         belState[i] = np.exp(belState[i] - Z)
     for i in range(1, nNodes):
-        belEdge[i] = np.exp(belEdge[i] - Z)
-    bel.Z = Z
-    return Z
+        sum_edge += np.exp(belEdge[i] - Z)
+    return Z, sum_edge
 
 
 
@@ -173,6 +177,6 @@ def decodeViterbi_fast(feature_temp, model):
 def getYYandY(model, example):
     Y, YY = getLogYY(example.features, model.n_tag, model.n_feature*model.n_tag, model.w, 1.0)
     mask_Y = maskY(example.tags, len(example), model.n_tag, Y)
-    mask_YY = YY.copy()
+    mask_YY = YY
     return Y, YY, mask_Y, mask_YY
 

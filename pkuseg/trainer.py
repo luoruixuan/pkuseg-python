@@ -35,7 +35,7 @@ def train(config=None):
     if config is None:
         config = Config()
 
-    feature_extractor = FeatureExtractor.load()
+    #feature_extractor = FeatureExtractor.load()
 
     feature_extractor = FeatureExtractor()
     feature_extractor.build(config.trainFile)

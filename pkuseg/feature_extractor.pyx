@@ -94,7 +94,7 @@ class FeatureExtractor:
         max_word_length = max(word_length_info.keys())
         for length in range(1, max_word_length + 1):
             print("length = {} : {}".format(length, word_length_info[length]))
-        print('special words: {}'.format(', '.join(specials)))
+        #print('special words: {}'.format(', '.join(specials)))
         # second pass to get features
 
         feature_freq = Counter()
@@ -289,11 +289,11 @@ class FeatureExtractor:
                 line = line.strip()
                 if not line:
                     # sentence finish
-                    for feautre_idx in features_idx:
-                        if not features_idx:
+                    for feature_idx in features_idx:
+                        if not feature_idx:
                             f_writer.write("0\n")
                         else:
-                            f_writer.write(",".join(map(str, feautre_idx)))
+                            f_writer.write(",".join(map(str, feature_idx)))
                             f_writer.write("\n")
                     f_writer.write("\n")
 

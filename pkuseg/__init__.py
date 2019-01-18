@@ -110,7 +110,7 @@ class PKUSeg:
         if user_dict == "safe_lexicon":
             file_name = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
-                "dicts/safe_lexicon.txt",
+                "dicts", "safe_lexicon.txt",
             )
         else:
             file_name = user_dict

@@ -23,12 +23,11 @@ class Config:
         self.trainFile = os.path.join("data", "small_training.utf8")
         self.testFile = os.path.join("data", "small_test.utf8")
         self._tmp_dir = tempfile.TemporaryDirectory()
-        self.homepath = "tmp"  # self._tmp_dir.name
+        self.homepath = self._tmp_dir.name
         self.tempFile = os.path.join(self.homepath, ".pkuseg", "temp")
         self.readFile = os.path.join("data", "small_test.utf8")
         self.outputFile = os.path.join("data", "small_test_output.utf8")
 
-        # self.runMode = "train"
         self.modelOptimizer = "crf.adf"
         self.rate0 = 0.05  # init value of decay rate in SGD and ADF training
         # self.reg = 1
@@ -47,37 +46,14 @@ class Config:
         self.save = 1  # save model file
         self.rawResWrite = True
         self.miniBatch = 1  # mini-batch in stochastic training
-        # self.nCV = 4  # automatic #-fold cross validation
-        # self.threadXX = None
         self.nThread = 10  # number of processes
-        # self.edgeReduce = 0.4
-        # self.useTraditionalEdge = True
         # ADF training
         self.upper = 0.995  # was tuned for nUpdate = 10
         self.lower = 0.6  # was tuned for nUpdate = 10
 
-        # general
-        # self.tuneSplit = 0.8  # size of data split for tuning
-        # self.debug = False  # some debug code will run in debug mode
-        # tuning
-        # self.iterTuneStoch = 30  # default 30
-
         # global variables
-        # self.chunkTagMap = {}
         self.metric = None
-        # self.ttlScore = 0
-        # self.interval = None
-        # self.scoreListList = []
-        # self.timeList = []
-        # self.errList = []
-        # self.diffList = []
         self.reg = 1
-        # self.glbIter = 0
-        # self.diff = (
-        #    1e100
-        # )  # relative difference from the previous object value, for convergence test
-        # self.countWithIter = 0
-        # self.outDir = ""
         self.outDir = self.outFolder
         self.testrawDir = "rawinputs/"
         self.testinputDir = "inputs/"
@@ -92,14 +68,6 @@ class Config:
 
         self.c_test = os.path.join(self.tempFile, "test.conll.txt")
         self.f_test = os.path.join(self.tempFile, "test.feat.txt")
-
-        # self.fTrain = os.path.join(self.tempFile, "train.txt")
-
-        # self.fTest = os.path.join(self.tempFile, "test.txt")
-        # self.fDev = os.path.join(self.tempFile, "dev.txt")
-
-        # self.dev = False  # for testing also on dev data
-        # self.formatConvert = True
 
         self.fTune = "tune.txt"
         self.fLog = "trainLog.txt"
@@ -127,10 +95,6 @@ class Config:
         self.order = 1
 
     def globalCheck(self):
-        # if self.runMode.find("test") >= 0:
-        #     self.ttlIter = 1
-        # if self.evalMetric == "f1":
-        #     self.getChunkTagMap()
         if self.evalMetric == "f1":
             self.metric = "f-score"
         elif self.evalMetric == "tok.acc":
@@ -145,35 +109,6 @@ class Config:
         assert self.nUpdate > 0
         assert self.miniBatch > 0
         assert self.reg > 0
-        # for reg in self.regList:
-        #     assert reg >= 0
-
-    # def getChunkTagMap(self):
-    #     self.chunkTagMap = {}
-    #     with open(
-    #         os.path.join(self.modelDir, "tagIndex.txt"), encoding="utf-8"
-    #     ) as f:
-    #         a = f.read()
-    #         a = a.replace("\r", "")
-    #         ary = a.split(self.lineEnd)
-    #         for im in ary:
-    #             if im == "":
-    #                 continue
-    #             imAry = im.split(self.blank)
-    #             index = int(imAry[1])
-    #             tagAry = imAry[0].split(self.star)
-    #             tag = tagAry[-1]
-    #             if tag.startswith("I"):
-    #                 tag = "I"
-    #             if tag.startswith("O"):
-    #                 tag = "O"
-    #             self.chunkTagMap[index] = tag
-
-    # def reinitGlobal(self):
-    #     self.diff = 1e100
-    #     self.countWithIter = 0
-    #     self.glbIter = 0
-    #     return self
 
 
 config = Config()

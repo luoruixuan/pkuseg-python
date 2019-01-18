@@ -32,29 +32,32 @@ def get_grad_CRF(
 
     Ylist, YYlist, maskYlist, maskYYlist = _inf.getYYandY(model, x)
     # print(YYlist.shape, Ylist.shape, maskYYlist.shape, maskYlist.shape)
-    _inf.get_beliefs(bel, model, x, Ylist, YYlist)
-    _inf.get_beliefs(belMasked, model, x, maskYlist, maskYYlist)
-
-    ZGold = belMasked.Z
-    Z = bel.Z
+    Z, sum_edge = _inf.get_beliefs(bel, model, x, Ylist, YYlist)
+    ZGold, sum_edge_masked = _inf.get_beliefs(belMasked, model, x, maskYlist, maskYYlist)
 
     for i, node_feature_list in enumerate(x.features):
         # node_feature_list = x.features[i]
 
         for feature_id in node_feature_list:
-            for tag_id in range(n_tag):
-                trans_id = model._get_node_tag_feature_id(feature_id, tag_id)
-                id_set.add(tag_id)
-                grad[trans_id] += bel.belState[i][tag_id]
-                grad[trans_id] -= belMasked.belState[i][tag_id]
+            trans_id = model._get_node_tag_feature_id(feature_id, 0)
+            id_set.update(range(trans_id, trans_id + n_tag))
+            grad[trans_id:trans_id+n_tag] += bel.belState[i] - belMasked.belState[i]
+            #for tag_id in range(n_tag):
+            #    trans_id = model._get_node_tag_feature_id(feature_id, tag_id)
+            #    id_set.add(tag_id)
+            #    grad[trans_id] += bel.belState[i][tag_id]
+            #    grad[trans_id] -= belMasked.belState[i][tag_id]
 
-    for i in range(1, len(x)):
-        for tag_id in range(n_tag):
-            for pre_tag_id in range(n_tag):
-                trans_id = model._get_tag_tag_feature_id(pre_tag_id, tag_id)
-                id_set.add(trans_id)
+    backoff = model.n_feature * n_tag
+    grad[backoff:] += sum_edge - sum_edge_masked
+    #for i in range(1, len(x)):
+        #for tag_id in range(n_tag):
+        #    for pre_tag_id in range(n_tag):
+        #        trans_id = model._get_tag_tag_feature_id(pre_tag_id, tag_id)
+        #        id_set.add(trans_id)
 
-                grad[trans_id] += bel.belEdge[i][pre_tag_id, tag_id]
-                grad[trans_id] -= belMasked.belEdge[i][pre_tag_id, tag_id]
+        #        grad[trans_id] += bel.belEdge[i][pre_tag_id, tag_id]
+        #        grad[trans_id] -= belMasked.belEdge[i][pre_tag_id, tag_id]
+    id_set.update(range(backoff, backoff + n_tag * n_tag))
 
     return Z - ZGold, id_set

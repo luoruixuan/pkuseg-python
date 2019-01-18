@@ -1,9 +1,8 @@
+import setuptools
 from distutils.extension import Extension
 
 import numpy as np
-import setuptools
 from Cython.Build import cythonize
-
 
 def setup_package():
 
@@ -13,7 +12,8 @@ def setup_package():
         Extension(
             "pkuseg.inference",
             ["pkuseg/inference.pyx"],
-            include_dirs=[np.get_include()],
+            include_dirs=[np.get_include()], 
+            language="c++"
         ),
         Extension(
             "pkuseg.feature_extractor",
